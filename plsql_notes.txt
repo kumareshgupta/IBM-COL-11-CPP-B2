@@ -1,0 +1,328 @@
+PL/SQL :-
+
+SET SERVEROUTPUT ON;
+
+DECLARE 
+ v_name varchar2(20) NOT NULL :='RAM';
+ v_age number(2) := 12;
+BEGIN
+DBMS_OUTPUT.PUT_LINE(v_name||' Welcome to PLSQL Programming');
+DBMS_OUTPUT.PUT_LINE('Age : ' || v_age);
+END;
+
+
+To display first_name of an employee having id 101;
+SELECT first_name FROM EMPLOYEES WHERE EMPLOYEE_ID=101
+
+DECLARE 
+ v_firstname employees.first_name%TYPE;
+BEGIN
+ SELECT first_name INTO v_firstname FROM EMPLOYEES WHERE EMPLOYEE_ID=101;
+DBMS_OUTPUT.PUT_LINE('Name is ' || v_firstname);
+END;
+
+
+DECLARE 
+ v_firstname employees.first_name%TYPE;
+ v_lastname employees.last_name%TYPE;
+ v_jobid employees.job_id%TYPE;
+BEGIN
+ SELECT first_name, last_name, job_id INTO v_firstname, v_lastname, v_jobid FROM EMPLOYEES WHERE EMPLOYEE_ID=101;
+DBMS_OUTPUT.PUT_LINE( v_firstname || ' ' || v_lastname ||' is ' || v_jobid );
+END;
+
+
+DECLARE 
+ v_emp_rec employees%ROWTYPE;
+BEGIN
+ SELECT * INTO v_emp_rec FROM EMPLOYEES WHERE EMPLOYEE_ID=102;
+DBMS_OUTPUT.PUT_LINE( v_emp_rec.first_name || ' ' || v_emp_rec.last_name ||' is ' || v_emp_rec.job_id );
+END;
+/
+
+
+
+
+
+display country name, region id for country id 'IN' 
+countires table
+
+DECLARE 
+ v_emp_rec employees%ROWTYPE;
+BEGIN
+ SELECT * INTO v_emp_rec FROM EMPLOYEES WHERE EMPLOYEE_ID=102;
+DBMS_OUTPUT.PUT_LINE(v_emp_rec.first_name || ' ' ||v_emp_rec.last_name);
+DBMS_OUTPUT.NEW_LINE;
+DBMS_OUTPUT.PUT_LINE( v_emp_rec.job_id );
+DBMS_OUTPUT.PUT_LINE(v_emp_rec.first_name || ' ' ||v_emp_rec.last_name || CHR(10) || v_emp_rec.job_id);
+END;
+
+
+DECLARE 
+ v_ctr number(2) :=0;
+BEGIN
+ LOOP
+	v_ctr :=v_ctr + 1;
+	DBMS_OUTPUT.PUT_LINE(v_ctr);
+	EXIT WHEN v_ctr = 20;
+	
+	/*IF v_ctr = 20 THEN
+		EXIT;
+	END IF;*/
+
+END LOOP;
+END;
+
+
+
+DECLARE 
+ v_ctr number(2) := 3;
+ lower number(2);
+ higher number(2);
+BEGIN
+
+lower:=&lower;
+higher:=&higher;
+
+ FOR v_ctr IN lower..higher   
+	LOOP
+ 	DBMS_OUTPUT.PUT_LINE(v_ctr);
+	END LOOP;
+END;
+
+
+ DECLARE
+     v_row_deleted number(2);
+     v_empno employees.employee_id%TYPE := 176;
+    BEGIN
+    delete from emp_dummy where employee_id = v_empno;
+    v_row_deleted := SQL%ROWCOUNT;
+    dbms_output.put_line(v_row_deleted);
+   END;
+/
+
+
+----------------------------------------------------------
+declare
+	v_countryname countries.country_name%TYPE;
+begin
+	select country_name into v_countryname from countries 	where country_id='IN';
+	dbms_output.put_line(v_countryname);
+end;
+
+---------------------------------------------------------
+
+declare
+	v_countryrec countries%ROWTYPE;
+begin
+	select * into v_countryrec from countries where 	country_id='AR';
+	dbms_output.put_line(v_countryrec.country_name);
+end;
+
+-----------------------------------------------------------
+Write a PL/SQL block to display the job_id for an employee with employee_id 102 
+
+declare
+	v_jobid job_history.job_id%type;
+begin
+	select job_id into v_jobid from job_history where employee_id=102;
+	dbms_output.put_line('job id is ' || v_jobid );
+end;
+
+-----------------------------------------------------------
+
+declare
+	v_jobid job_history.job_id%type;
+	v_deptid job_history.department_id%type;
+begin
+	select job_id, department_id into v_jobid,v_deptid from job_history where employee_id=102;
+	dbms_output.put_line('job id is ' || v_jobid || ', was working in '|| v_deptid );
+end;
+-----------------------------------------------------------
+PLSQL for sales bonus 
+
+declare
+	sales number(5) :=1000;
+	bonus number(4);
+begin
+	IF sales > 5000 THEN
+		bonus :=100;
+	ELSIF sales > 3500 THEN
+		bonus :=50;
+	ELSE
+		bonus :=10;
+	END IF;
+	dbms_output.put_line('Salesman bonus :' || bonus ||' for '|| sales );
+end;
+----------------------------------------------------
+
+declare
+	counter number(2);
+begin
+	FOR counter IN  1..10
+	LOOP
+	dbms_output.put_line(counter );
+	END LOOP;
+end;
+
+-----------------------------------------------------
+
+declare
+	counter number(2);
+begin
+	FOR counter IN REVERSE 1..10
+	LOOP
+	dbms_output.put_line(counter );
+	END LOOP;
+end;
+----------------------------------------------------
+
+declare
+	departmentnum employees.department_id%TYPE;
+begin
+departmentnum:=&deptno;
+delete from emp_dummy where department_id=departmentnum;
+if(SQL%FOUND) then
+	dbms_output.put_line('Record deleted :- ' ||departmentnum  );
+elsif (SQL%NOTFOUND) then
+	dbms_output.put_line('Record not found :- ');
+end if;
+end;
+
+-----------------------------------------
+declare 
+v_emp_fname emp_dummy.first_name%TYPE;
+v_emp_sal emp_dummy.salary%TYPE;
+
+cursor cur_emp IS SELECT first_name, salary FROM emp_dummy where department_id in (30,60);
+
+BEGIN
+OPEN cur_emp;
+LOOP
+	FETCH cur_emp INTO v_emp_fname,v_emp_sal;
+	EXIT WHEN cur_emp%NOTFOUND;
+	DBMS_OUTPUT.PUT_LINE(v_emp_fname ||' ' || v_emp_sal );
+END LOOP;
+CLOSE cur_emp;
+END;
+--------------------------------------
+
+DECLARE
+      v_fname emp_dummy.first_name%TYPE;
+      v_sal emp_dummy.salary%TYPE;
+      CURSOR emp_cur IS SELECT first_name, salary FROM emp_dummy
+    WHERE salary > 10000;
+    BEGIN
+     OPEN emp_cur ;
+	LOOP
+     FETCH emp_cur INTO v_fname, v_sal;
+	EXIT WHEN emp_cur%NOTFOUND;
+     DBMS_OUTPUT.PUT_LINE(v_fname ||' - ' || v_sal);
+	END LOOP;
+DBMS_OUTPUT.PUT_LINE(emp_cur%ROWCOUNT);
+    CLOSE emp_cur;
+  END;
+--------------------------------------
+
+declare 
+num1 number := 10;
+num2 number := 0;
+result number;
+BEGIN
+num1 := &num1;
+num2 := &num2;
+result := num1/num2;
+dbms_output.put_line('result is ' || result);
+EXCEPTION
+WHEN ZERO_DIVIDE THEN
+dbms_output.put_line('Divide by ZERO' || SQLCODE ||' '||SQLERRM);
+WHEN OTHERS THEN
+dbms_output.put_line('some other error!!');
+END;
+---------------------------------------------------
+DECLARE
+	num1 number(2) := 10;
+	num2 number(2) := 2;
+	result number(2);
+ BEGIN
+	result := &num1 / &num2;
+	dbms_output.put_line('Result is ' || result);
+ EXCEPTION
+	WHEN ZERO_DIVIDE THEN
+	dbms_output.put_line('divide by ZERO... please dont do this');			dbms_output.put_line(SQLCODE || ' <==> ' || SQLERRM);
+  END;
+declare 
+num1 number := 10;
+num2 number := 0;
+result number;
+BEGIN
+num1 := &num1;
+num2 := &num2;
+result := num1/num2;
+if(result = 0) then
+raise_application_error(-20123 , ' result cannot be zero');
+end if;
+dbms_output.put_line('result is ' || result);
+EXCEPTION
+WHEN ZERO_DIVIDE THEN
+dbms_output.put_line('Divide by ZERO' || SQLCODE ||' '||SQLERRM);
+WHEN OTHERS THEN
+dbms_output.put_line(SQLCODE ||' - some other error!! - '||SQLERRM);
+END;
+
+----
+
+create or replace procedure display(num1 in out number)
+is
+begin
+num1:= num1 +10;
+end;
+---------------
+CREATE OR REPLACE PROCEDURE welcome (name IN VARCHAR2, sal out number)
+IS
+BEGIN
+sal:= 12345;
+dbms_output.put_line ('Welcome '|| name ||' - ' || sal);
+
+END;
+
+
+
+CREATE OR REPLACE PROCEDURE sum (num1 IN number,num2 in number, result out number)
+IS
+BEGIN
+result := num1 + num2;
+dbms_output.put_line ('result '|| result);
+END;
+/
+
+create or replace function get_salary (empid emp_dummy.employee_id%type)
+    return number is
+     v_sal emp_dummy.salary%type;
+    begin
+     select salary into v_sal from emp_dummy where employee_id = empid;
+     return (v_sal);
+   end get_salary;
+
+
+--------------------
+
+create or replace function get_salary (empid emp_dummy.employee_id%type)
+    return number is
+     v_sal emp_dummy.salary%type;
+     bonus number(4,2);
+    begin
+     select salary into v_sal from emp_dummy where employee_id = empid;
+   if(v_sal > 10000) then
+	bonus := .1;
+   elsif (v_sal > 6000 and v_sal <=10000) then
+	bonus := .08;
+   else 
+	bonus := .05;	
+   end if;
+     v_sal := v_sal + v_sal * bonus;
+     return (v_sal);
+   end get_salary;
+/
+
+
