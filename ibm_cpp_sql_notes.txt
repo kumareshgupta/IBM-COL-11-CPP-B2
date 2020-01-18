@@ -1,0 +1,485 @@
+
+connect  System
+ALTER USER hr ACCOUNT UNLOCK;
+ALTER USER hr IDENTIFIED BY hr;
+
+connect hr/hr
+
+
+SELECT owner, table_name 
+FROM all_tables;
+
+
+SELECT table_name
+FROM user_tables
+ORDER BY table_name;
+
+select department_id, avg(salary) from employees
+group by department_id
+
+
+select department_id, job_id, avg(salary),count(*) from employees
+group by department_id, job_id
+
+select first_name, last_name from employees where salary = &sal
+
+
+
+select first_name, sysdate-hiredate from employees;
+
+inner join:-
+
+select e.first_name,e.salary, d.department_name
+from employees e
+inner join departments d
+on e.department_id=d.department_id
+
+select e.first_name,e.salary, d.department_name
+from employees e
+inner join departments d
+using (department_id)
+
+
+self join :-
+select w.first_name, m.first_name
+from employees w, employees m
+where w.employee_id = m.manager_id
+
+select w.first_name, m.first_name
+from employees w join employees m
+on w.employee_id = m.manager_id
+
+select w.first_name, m.first_name
+from employees w inner join employees m
+on w.employee_id = m.manager_id
+
+
+select e.last_name, d.department_id, d.department_name
+from employees e LEFT OUTER JOIN departments d
+on (e.department_id = d.department_id)
+
+select e.last_name, d.department_id, d.department_name
+from employees e , departments d
+where e.department_id = d.department_id(+)
+
+
+select e.last_name, d.department_id, d.department_name
+from employees e RIGHT OUTER JOIN departments d
+on (e.department_id = d.department_id)
+
+select e.last_name, d.department_id, d.department_name
+from employees e FULL OUTER JOIN departments d
+on (e.department_id = d.department_id)
+
+
+
+select employee_id, last_name, job_id, salary
+from employees
+where salary < any (select salary from employees where job_id = 'IT_PROG')
+and job_id <> 'IT_PROG'
+
+
+
+select e.first_name ||' ' || e.last_name || ' is the manager of the '|| d.department_name Managers 
+from employees , departments d
+where e.department_id = d.department_id and e.manager_id = d.manager_id
+
+select first_name ||' ' || last_name || ' is the manager of the '|| department_name Managers from employees natural join departments 
+
+
+insert into hire_dates (id, hiredate) values (101,'12-Jan-2019')
+insert into hire_dates values (103,'15-Jan-2019')
+
+insert into hire_dates (id) values(102);
+
+
+
+create table dept (dept_id number(2), dept_name varchar2(20),
+constraint dept_pk primary key(dept_id)
+)
+
+
+create table emp (empid number(3) constraint emp_pk primary key,
+empname varchar2(20),
+phone number(10),
+dept_id number(2),
+constraint emp_fk foreign key(dept_id) references dept (dept_id));
+
+
+
+
+ insert into emp values(111,'Ram', 1234567,10);
+insert into emp values(111,'Ram', 1234567,10)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (HR.EMP_PK) violated
+
+
+
+
+
+
+
+
+SQL> insert into emp values(112,'Ram', 1234567,30);
+insert into emp values(112,'Ram', 1234567,30)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (HR.EMP_FK) violated - parent key not found
+
+create table sailors (sid number(2) constraint sailors_pk primary key,
+sname varchar2(20), 
+rating number(2), 
+age number(4,1))
+
+create table boats(bid number(3) constraint boats_pk primary key,
+bname varchar2(20), 
+color varchar2(10))
+
+
+
+create table reserves(sid number(3),
+bid number(3),
+day date,
+ constraint reserves_sailors_fk foreign key (sid) references sailors(sid),
+ constraint reserves_boats_fk foreign key (bid) references boats(bid)
+)
+
+
+
+
+
+ sql>@E:\myq.sql 
+
+
+create table employee1 (
+empid number(4)  primary key,
+empname varchar(20) not null,
+salary number(7,2) check(salary>1000));
+
+insert into employee1 values(1001, 'Shyam',1001.00);
+
+create table employee3 (
+empid number(4)  primary key,
+empname varchar2(20) not null,
+salary number(8,2) check(salary>1000 and salary <100000),
+location varchar2(20) check (location in ('Bengaluru', 'Hyderabad','Dhanbad'))
+);
+
+insert into employee2 values(1001, 'Ram',10000.00,'Bengaluru')
+
+
+create table employee5 (
+empid number(4) ,
+empname varchar2(20) not null,
+email varchar2(20),
+salary number(8,2) ,
+location varchar2(20) ,
+primary key(empid),
+unique(email),
+check(salary between 1000 and 100000),
+check (location in ('Bengaluru', 'Hyderabad','Dhanbad'))
+);
+
+
+
+create table employee6 (
+empid number(4) ,
+empname varchar2(20) not null,
+email varchar2(20),
+salary number(8,2) ,
+location varchar2(20) ,
+constraint employees5_pk primary key(empid),
+constraint employees5_email_uk unique(email),
+constraint employees5_salary_ck check(salary between 1000 and 100000),
+constraint employees5_loc_ck check (location in ('Bengaluru', 'Hyderabad','Dhanbad'))
+);
+
+
+table - all_constraints
+select * from all_constraints;
+desc all_constraints
+
+
+alter table employee1
+add (email varchar2(12) not null);
+
+ORA-01758: table must be empty to add mandatory (NOT NULL) column
+
+alter table employee1
+add (email varchar2(12) unique);
+
+alter table employee1
+add (phone2 varchar2(10) unique) ,
+(dept varchar2(10) not null);
+
+insert into employee1 values (1002,'Ram',10000.00,'Mumbai','ram@shy.com');
+
+
+alter table employee1
+modify email varchar2(25);
+
+alter table employee1
+modify email varchar2(5);
+
+==> ORA-01441: cannot decrease column length because some value is too big
+
+alter table employee1 
+drop column phone2;
+
+alter table employee1
+modify empid varchar2(5);
+
+==> ORA-01439: column to be modified must be empty to change datatype
+
+alter table employee1
+modify phone number(10);
+
+
+alter table employee1
+modify empid primary key;
+
+==>ORA-02260: table can have only one primary key
+
+alter table employee1
+drop primary key;
+
+After adding duplicate value in empid
+
+==>ORA-02437: cannot validate (HR.SYS_C009328) - primary key violated
+
+ORA-00001: unique constraint (HR.SYS_C009329) violated
+
+
+create table dept1 (dept_id varchar2(12),
+dept_name varchar2(20));
+
+alter table dept1
+add constraint dept1_pk primary key(dept_id);
+
+alter table employee1
+add constraint employee1_dept1_fk foreign key (dept)
+references dept1(dept_id)
+
+
+alter table employee1
+drop constraint employee1_dept1_fk;
+
+create table emp_dummy as
+select * from employees;
+
+create table emp_dummy1 as
+select * from employees where salary>10000;
+
+
+
+
+update emp_dummy1 
+set salary=salary+salary*.5 , department_id=900
+where department_id=90 ;
+
+
+delete emp_dummy1;
+-> it will delete all the records, can be rolled back
+
+rollback
+-> it will bring all the records back
+
+truncate emp_dummy1;
+-> it will delete all the records permanently - can't be rolled back
+
+
+insert into employee1 values(1003, 'Rama',10000.00,'Bengaluru', 'ram@gmail.com',12345,'IT');
+
+savepoint transaction1;
+insert into employee1 values(1224, 'Raman',10000.00,'Dhanbad', 'raman@gmail.com',22345,'IT');
+update employee1 
+set salary = salary+1000;
+rollback to savepoint transaction1;
+
+DCL :-
+===============
+after login in system :-
+
+create user kumaresh identified by welcome;
+
+ORA-01045: user KUMARESH lacks CREATE SESSION privilege; logon denied
+
+grant create session to kumaresh;
+
+
+At user window:-
+create table test(testid number(10), testname varchar2(20))
+
+ORA-01031: insufficient privileges
+
+At system window:-
+alter user kumaresh quota 100m on system;
+
+
+At user window:-
+create table test(testid number(10), testname varchar2(20))
+
+table created
+At system window:-
+grant select on hr.employees to kumaresh
+
+
+grant create view to kumaresh;
+
+create role manager;
+
+
+
+grant create table, create view to manager;
+
+ grant select, insert, update 
+	on kumaresh.test 
+	to ram
+	with grant option;
+
+grant update on kumaresh.test to public;
+
+
+ revoke update on kumaresh.test from ram;
+
+
+create table course( cid number(4) primary key,
+ctitle varchar2(20));
+insert into course values(100, 'SQL');
+insert into course values(101, 'PLSQL');
+insert into course values(102, 'DB2');
+insert into course values(103, 'Sybase');
+
+create table student(sid number(5) primary key,
+sname varchar2(20), 
+cid number(4) foreign key references course(cid));
+
+insert into student values(111,'Manu', 100);
+insert into student values(112,'Manohar', 101);
+insert into student values(113,'Manoj', 102);
+insert into student values(114,'Mano', 103);
+insert into student values(115,'Bano', 100);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
